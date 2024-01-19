@@ -1,0 +1,83 @@
+version: '3.7'
+
+services:
+  bot:
+    container_name: bot
+    build:
+      context: ./bot
+    restart: always
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "10"
+    depends_on:
+      - db
+
+  factory:
+    container_name: factory
+    build:
+      context: ./factory
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - db
+  
+  dozzle:
+    container_name: dozzle
+    restart: unless-stopped
+    environment:
+      - DOZZLE_LEVEL=info
+      - DOZZLE_FILTER="status=running"
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    ports:
+      - 8080:8080
+
+  db:
+    container_name: db
+    image: postgres:16
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - db
+
+  admin-panel:
+    container_name: admin-panel
+    build:
+      context: ./admin
+    ports:
+      - 5000:5000
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+  pgadmin-data:

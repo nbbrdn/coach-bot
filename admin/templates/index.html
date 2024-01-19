@@ -1,0 +1,35 @@
+ {% extends 'base.html' %}
+
+{% block content %}
+    <h2>Dialogs</h2>
+    <table id="data" class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>User</th>
+                <th>Actor</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dialog in dialogs %}
+            <tr>
+                <td>{{ dialog[0] }}</td>
+                <td>{{ dialog[4] }}</td>
+                <td>{{ dialog[1] }}</td>
+                <td>{{ dialog[2] }}</td>
+                <td>{{ dialog[3] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function () {
+      $('#data').DataTable();
+    });
+  </script>
+{% endblock %}
